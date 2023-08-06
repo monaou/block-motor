@@ -5,6 +5,8 @@ import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { useSafeBalances } from './hooks/useSafeBalances';
 import BalancesTable from './components/BalancesTable';
 import Modal from 'react-modal';
+import ImageUpload from './components/ImageUpload';
+
 
 Modal.setAppElement('#root');
 
@@ -40,6 +42,16 @@ const SafeApp = (): React.ReactElement => {
     console.log("Minting NFT with name:", imageName);
     setModalOpen(false);
   };
+  // ... SafeAppコンポーネントの中
+  const handleImageUploadSuccess = (response: any) => {
+    console.log(response)
+    // 応答に応じて、NFTのミントを呼び出すロジック
+  };
+
+  const handleImageUploadError = (error: any) => {
+    console.error("Error uploading image:", error);
+  };
+
 
   return (
     <Container>
@@ -56,7 +68,7 @@ const SafeApp = (): React.ReactElement => {
           value={imageName}
           onChange={(e) => setImageName(e.target.value)}
         />
-        {/* 画像アップロードのコンポーネントを追加 */}
+        <ImageUpload onUploadSuccess={handleImageUploadSuccess} onUploadError={handleImageUploadError} />
         <Button size="md" color="primary" onClick={handleSave}>
           Save
         </Button>
