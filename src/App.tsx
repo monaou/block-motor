@@ -31,6 +31,7 @@ const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK();
   const [isModalOpen, setModalOpen] = useState(false);
   const [imageName, setImageName] = useState('');
+  const [imageId, setImageId] = useState('');
   const [balances] = useSafeBalances(sdk);
 
   const handleRegister = () => {
@@ -67,6 +68,11 @@ const SafeApp = (): React.ReactElement => {
           label="Image Name"
           value={imageName}
           onChange={(e) => setImageName(e.target.value)}
+        />
+        <TextField
+          label="Image Id"
+          value={imageId}
+          onChange={(e) => setImageId(e.target.value)}
         />
         <ImageUpload onUploadSuccess={handleImageUploadSuccess} onUploadError={handleImageUploadError} />
         <Button size="md" color="primary" onClick={handleSave}>
