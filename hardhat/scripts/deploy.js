@@ -1,12 +1,12 @@
+const { ethers } = require("hardhat");
 const fs = require('fs');
 
-// Type your own PUBLIC key in here
-
 async function main() {
-  const ContractFactory = await ethers.getContractFactory("CarNFT");
-  const contract = await ContractFactory.deploy();
+  const FIXED_GAS_PRICE = ethers.utils.parseUnits("20", "gwei");
 
-  await contract.deployed();
+  const ContractFactory = await ethers.getContractFactory("Web3Mint");
+  const contract = await ContractFactory.deploy({ gasPrice: FIXED_GAS_PRICE });
+
   console.log("Dino Runner contract deployed to:", contract.address);
 
   // アドレスをオブジェクトとして作成
