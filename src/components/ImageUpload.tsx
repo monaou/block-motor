@@ -4,17 +4,20 @@ import { Button } from '@gnosis.pm/safe-react-components';
 interface ImageUploadProps {
     onUploadSuccess: (response: any) => void;
     onUploadError: (error: any) => void;
+    onFileSelected: (file: File) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadError }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadError, onFileSelected }) => {
     const [preview, setPreview] = useState<string | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files![0];
         if (file) {
+            onFileSelected(file);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreview(reader.result as string);
+                const result = reader.result as string;
+                setPreview(result);
             };
             reader.readAsDataURL(file);
         }
