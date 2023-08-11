@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Title, TextField, Button } from '@gnosis.pm/safe-react-components';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
 import { useSafeBalances } from './hooks/useSafeBalances';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import BalancesTable from './components/BalancesTable';
 import Modal from 'react-modal';
 import ImageUpload from './components/ImageUpload';
-// import contractAddress from './contractAddress.json';
+import contractAddress from './contractAddress.json';
+import web3Mint from './Web3Mint.json';
 import { Web3Storage } from 'web3.storage'
+import { ethers } from 'ethers';
 
 Modal.setAppElement('#root');
 
@@ -39,6 +42,7 @@ const SafeApp = (): React.ReactElement => {
   const handleRegister = () => {
     setModalOpen(true);
   };
+  const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
 
   const handleSave = async () => {
     // NFTミントのロジックをここに追加
@@ -52,12 +56,21 @@ const SafeApp = (): React.ReactElement => {
         name: 'experiment',
         maxRetries: 3
       });
+      // const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
+      const signer = await web3Provider.getSigner();
+      const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
       const res = await client.get(rootCid) // Web3Response
       if (res) {
         const files = await res.files() // Web3File[]
         for (const file of files) {
           console.log("file.cid:", file.cid)
-
+          try {
+            const tx = await contract.mintIpfsNFT(imageName, file.cid);
+            await tx.wait();
+            console.log('Data has been saved successfully', { imageName });
+          } catch (err) {
+            console.error("An error occurred while saving the data", err);
+          }
         }
         setModalOpen(false);
       }

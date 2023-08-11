@@ -1,6 +1,6 @@
 // import { AbiItem } from 'web3-utils';
 import { encodeFunctionCall } from 'web3-eth-abi';
-import { BaseTransaction, TokenBalance } from '@gnosis.pm/safe-apps-sdk';
+import { BaseTransaction, TokenBalance } from '@safe-global/safe-apps-sdk';
 import { ERC_20_ABI } from '../abis/erc20';
 
 function encodeTxData(method: any, recipient: string, amount: string): string {
