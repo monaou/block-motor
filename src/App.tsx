@@ -2,13 +2,12 @@ import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Title, TextField, Button } from '@gnosis.pm/safe-react-components';
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
-import { useSafeBalances } from './hooks/useSafeBalances';
+import useSafeNFTs from './hooks/useSafeBalances';
 import { SafeAppProvider } from '@safe-global/safe-apps-provider';
-import BalancesTable from './components/BalancesTable';
 import Modal from 'react-modal';
 import ImageUpload from './components/ImageUpload';
-import contractAddress from './contractAddress.json';
-import web3Mint from './Web3Mint.json';
+import contractAddress from './shared_json/contractAddress.json';
+import web3Mint from './shared_json/Web3Mint.json';
 import { Web3Storage } from 'web3.storage'
 import { ethers } from 'ethers';
 
@@ -36,13 +35,14 @@ const SafeApp = (): React.ReactElement => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [imageName, setImageName] = useState('');
   const [imageId, setImageId] = useState('');
-  const [balances] = useSafeBalances(sdk);
+  const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
+
+  const [nfts, loadingNFTs] = useSafeNFTs(web3Provider, safe.safeAddress);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleRegister = () => {
     setModalOpen(true);
   };
-  const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
 
   const handleSave = async () => {
     // NFTミントのロジックをここに追加
@@ -117,7 +117,16 @@ const SafeApp = (): React.ReactElement => {
         </Button>
       </Modal>
 
-      <BalancesTable balances={balances} />
+      {loadingNFTs ? (
+        <p>Loading NFTs...</p>
+      ) : (
+        <>
+          <h3>Owned NFTs:</h3>
+          {nfts.map((nftId: any) => (
+            <p key={nftId}>NFT ID: {nftId}</p>
+          ))}
+        </>
+      )}
     </Container >
   );
 };

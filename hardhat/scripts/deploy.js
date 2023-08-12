@@ -1,5 +1,6 @@
 const { ethers } = require("hardhat");
 const fs = require('fs');
+const path = require('path');
 
 async function main() {
   const FIXED_GAS_PRICE = ethers.utils.parseUnits("20", "gwei");
@@ -7,7 +8,7 @@ async function main() {
   const ContractFactory = await ethers.getContractFactory("Web3Mint");
   const contract = await ContractFactory.deploy({ gasPrice: FIXED_GAS_PRICE });
 
-  console.log("Dino Runner contract deployed to:", contract.address);
+  console.log("NFT contract deployed to:", contract.address);
 
   // アドレスをオブジェクトとして作成
   const addressObject = {
@@ -15,12 +16,18 @@ async function main() {
   };
 
   // JSON形式でオブジェクトを文字列に変換
-  const jsonData = JSON.stringify(addressObject, null, 2);
+  const addressData = JSON.stringify(addressObject, null, 2);
 
-  // JSONデータをファイルに書き込む
-  fs.writeFileSync('contractAddress.json', jsonData);
+  // ABIを取得
+  const abiData = JSON.stringify(ContractFactory.interface, null, 2);
 
-  console.log("Dino Runner address saved to: contractAddress.json");
+  // JSONデータを`shared/contracts`フォルダに書き込む
+  const sharedContractsPath = path.join(__dirname, '..', '..', 'src', 'shared_json');
+
+  fs.writeFileSync(path.join(sharedContractsPath, 'contractAddress.json'), addressData);
+  fs.writeFileSync(path.join(sharedContractsPath, 'Web3Mint.json'), abiData);
+
+  console.log("NFT address and ABI saved to: src/shared_json");
 }
 
 main()

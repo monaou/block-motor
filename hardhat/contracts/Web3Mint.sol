@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
-import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 
 //OpenZeppelinが提供するヘルパー機能をインポートします。
 import '@openzeppelin/contracts/utils/Counters.sol';
 
 import './libraries/Base64.sol';
 
-contract Web3Mint is ERC721 {
+contract Web3Mint is ERC721Enumerable {
     struct NftAttributes {
         string name;
         string imageURL;
