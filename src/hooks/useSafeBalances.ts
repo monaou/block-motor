@@ -4,12 +4,13 @@ import { ethers } from 'ethers';
 import web3Mint from './../shared_json/Web3Mint.json';
 import contractAddress from './../shared_json/contractAddress.json';
 
-// web3ProviderとsafeAddressを引数として受け取るように変更
 const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: string): [any[], boolean] => {
     const [nfts, setNFTs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;  // 新しいフラグを追加
+
         const fetchNFTs = async () => {
             try {
                 const signer = await web3Provider.getSigner();
@@ -22,20 +23,27 @@ const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
 
                 for (let i = 0; i < balance.toNumber(); i++) {
                     const tokenId = await contract.tokenOfOwnerByIndex(safeAddress, i);
-                    nftIds.push(tokenId);
+                    nftIds.push(tokenId.toNumber());
                 }
 
-                // If you want to fetch more details about each NFT, you can use the above nftIds and call other contract methods
-
-                setNFTs(nftIds);
-                setLoading(false);
+                if (isMounted) {  // isMountedフラグでチェック
+                    setNFTs(nftIds);
+                    setLoading(false);
+                }
             } catch (error) {
                 console.error("Error fetching NFTs:", error);
-                setLoading(false);
+                if (isMounted) {  // isMountedフラグでチェック
+                    setLoading(false);
+                }
             }
         };
 
         fetchNFTs();
+
+        return () => {
+            isMounted = false;  // クリーンアップ関数でフラグをfalseに設定
+        };
+
     }, [web3Provider, safeAddress]);
 
     return [nfts, loading];
