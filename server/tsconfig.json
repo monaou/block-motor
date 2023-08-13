@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "./dist", // トランスパイルされたJSファイルの出力先
+    "esModuleInterop": true
+  },
+  "include": [
+    "*.ts" // トランスパイルするTypeScriptファイルのパス。必要に応じて変更してください。
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
