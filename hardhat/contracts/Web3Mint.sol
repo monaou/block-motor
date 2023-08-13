@@ -37,9 +37,9 @@ contract Web3Mint is ERC721Enumerable {
                     abi.encodePacked(
                         '{"name": "',
                         Web3Nfts[_tokenId].name,
-                        ' -- NFT #: ',
+                        '", "id": "',
                         Strings.toString(_tokenId),
-                        '", "description": "An epic NFT", "image": "ipfs://',
+                        '", "description": "", "image": "ipfs://',
                         Web3Nfts[_tokenId].imageURL,
                         '"}'
                     )

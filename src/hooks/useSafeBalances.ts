@@ -15,19 +15,29 @@ const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
             try {
                 const signer = await web3Provider.getSigner();
                 const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
-                console.log(safeAddress)
                 const balance = await contract.balanceOf(safeAddress);
-                console.log(balance)
 
-                const nftIds: number[] = [];
+                const fetchedNFTs: any[] = [];
 
                 for (let i = 0; i < balance.toNumber(); i++) {
                     const tokenId = await contract.tokenOfOwnerByIndex(safeAddress, i);
-                    nftIds.push(tokenId.toNumber());
+                    const tokenURI = await contract.tokenURI(tokenId.toNumber());
+
+                    // Remove the prefix from the tokenURI
+                    const base64String = tokenURI.replace('data:application/json;base64,', '');
+                    const jsonString = atob(base64String);
+                    const metaDataObj = JSON.parse(jsonString);
+                    fetchedNFTs.push({
+                        id: tokenId.toNumber(),
+                        name: metaDataObj.name,
+                        description: metaDataObj.description,
+                        imageUrl: metaDataObj.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+                    });
+
                 }
 
                 if (isMounted) {  // isMountedフラグでチェック
-                    setNFTs(nftIds);
+                    setNFTs(fetchedNFTs);
                     setLoading(false);
                 }
             } catch (error) {

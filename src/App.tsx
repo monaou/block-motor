@@ -10,6 +10,7 @@ import contractAddress from './shared_json/contractAddress.json';
 import web3Mint from './shared_json/Web3Mint.json';
 import { Web3Storage } from 'web3.storage'
 import { ethers } from 'ethers';
+import NFTTable from './components/NFTTable';
 
 Modal.setAppElement('#root');
 
@@ -122,9 +123,7 @@ const SafeApp = (): React.ReactElement => {
       ) : (
         <>
           <h3>Owned NFTs:</h3>
-          {nfts.map((nftId: any) => (
-            <p key={nftId}>NFT ID: {nftId}</p>
-          ))}
+          <NFTTable nfts={nfts} />
         </>
       )}
     </Container >
