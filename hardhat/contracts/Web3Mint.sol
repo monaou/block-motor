@@ -1,32 +1,31 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
-
-//OpenZeppelinが提供するヘルパー機能をインポートします。
 import '@openzeppelin/contracts/utils/Counters.sol';
-
+import '@openzeppelin/contracts/utils/Strings.sol';
 import './libraries/Base64.sol';
 
 contract Web3Mint is ERC721Enumerable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+
     struct NftAttributes {
         string name;
         string imageURL;
+        string car_unique_id;
+        uint256 created_timestamp;
     }
 
-    using Counters for Counters.Counter;
-    // tokenIdはNFTの一意な識別子で、0, 1, 2, .. N のように付与されます。
-    Counters.Counter private _tokenIds;
-
-    NftAttributes[] Web3Nfts;
+    NftAttributes[] private Web3Nfts;
 
     constructor() ERC721('NFT', 'nft') {}
 
-    // ユーザーが NFT を取得するために実行する関数です。
-
-    function mintIpfsNFT(string memory name, string memory imageURI) public {
+    function mintIpfsNFT(string memory name, string memory imageURI, string memory carId) public {
         uint256 newItemId = _tokenIds.current();
         _safeMint(msg.sender, newItemId);
-        Web3Nfts.push(NftAttributes({name: name, imageURL: imageURI}));
+        Web3Nfts.push(
+            NftAttributes({name: name, imageURL: imageURI, car_unique_id: carId, created_timestamp: block.timestamp})
+        );
         _tokenIds.increment();
     }
 
@@ -41,6 +40,8 @@ contract Web3Mint is ERC721Enumerable {
                         Strings.toString(_tokenId),
                         '", "description": "", "image": "ipfs://',
                         Web3Nfts[_tokenId].imageURL,
+                        '", "car_unique_id": "',
+                        Web3Nfts[_tokenId].car_unique_id,
                         '"}'
                     )
                 )
@@ -48,5 +49,26 @@ contract Web3Mint is ERC721Enumerable {
         );
         string memory output = string(abi.encodePacked('data:application/json;base64,', json));
         return output;
+    }
+
+    function getTokensByCarId(string memory carId) public view returns (uint256[] memory) {
+        uint256 totalNfts = _tokenIds.current();
+        uint256[] memory matchingTokens = new uint256[](totalNfts);
+
+        uint256 counter = 0;
+        for (uint256 i = 0; i < totalNfts; i++) {
+            if (keccak256(abi.encodePacked(Web3Nfts[i].car_unique_id)) == keccak256(abi.encodePacked(carId))) {
+                matchingTokens[counter] = i; // トークンのID（この場合は`i`）を配列に追加
+                counter++;
+            }
+        }
+
+        // Resize the array
+        uint256[] memory resultTokens = new uint256[](counter);
+        for (uint256 j = 0; j < counter; j++) {
+            resultTokens[j] = matchingTokens[j];
+        }
+
+        return resultTokens;
     }
 }

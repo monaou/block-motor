@@ -24,13 +24,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const WalletInfo = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-
 const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -66,9 +59,9 @@ const SafeApp = (): React.ReactElement => {
         for (const file of files) {
           console.log("file.cid:", file.cid)
           try {
-            const tx = await contract.mintIpfsNFT(imageName, file.cid);
+            const tx = await contract.mintIpfsNFT(imageName, file.cid, imageId);
             await tx.wait();
-            console.log('Data has been saved successfully', { imageName });
+            console.log('Data has been saved successfully', { imageName, imageId });
           } catch (err) {
             console.error("An error occurred while saving the data", err);
           }
@@ -90,12 +83,7 @@ const SafeApp = (): React.ReactElement => {
 
   return (
     <Container>
-      <WalletInfo>
-        <Title size="sm">Wallet: {safe.safeAddress}</Title>
-      </WalletInfo>
-      <Button size="md" color="primary" onClick={handleRegister}>
-        Register
-      </Button>
+      <Title size="sm">Wallet: {safe.safeAddress}</Title>
       <Modal isOpen={isModalOpen} onRequestClose={() => setModalOpen(false)}>
         <Title size="xs">Register NFT</Title>
         <TextField
@@ -123,6 +111,9 @@ const SafeApp = (): React.ReactElement => {
       ) : (
         <>
           <h3>Owned NFTs:</h3>
+          <Button size="md" color="primary" onClick={handleRegister}>
+            Register
+          </Button>
           <NFTTable nfts={nfts} />
         </>
       )}
