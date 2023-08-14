@@ -18,8 +18,13 @@ async function main() {
   // JSON形式でオブジェクトを文字列に変換
   const addressData = JSON.stringify(addressObject, null, 2);
 
-  // ABIを取得
-  const abiData = JSON.stringify(ContractFactory.interface.format(ethers.utils.FormatTypes.full), null, 2);
+  const abiObject = {
+    _format: "hh-sol-artifact-1",
+    contractName: "Web3Mint",
+    sourceName: "contracts/Web3Mint.sol",
+    abi: ContractFactory.interface.fragments
+  };
+  const abiData = JSON.stringify(abiObject, null, 2);
 
   // JSONデータを`shared/contracts`フォルダに書き込む
   const sharedContractsPath = path.join(__dirname, '..', '..', 'src', 'shared_json');

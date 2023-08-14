@@ -50,7 +50,6 @@ const SafeApp = (): React.ReactElement => {
         name: 'experiment',
         maxRetries: 3
       });
-      // const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
       const signer = await web3Provider.getSigner();
       const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
       const res = await client.get(rootCid) // Web3Response

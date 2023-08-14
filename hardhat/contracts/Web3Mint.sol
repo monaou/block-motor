@@ -30,6 +30,7 @@ contract Web3Mint is ERC721Enumerable {
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+        address ownerAddress = ownerOf(_tokenId);
         string memory json = Base64.encode(
             bytes(
                 string(
@@ -42,6 +43,8 @@ contract Web3Mint is ERC721Enumerable {
                         Web3Nfts[_tokenId].imageURL,
                         '", "car_unique_id": "',
                         Web3Nfts[_tokenId].car_unique_id,
+                        '", "owner": "',
+                        Strings.toHexString(uint256(uint160(ownerAddress)), 20), // Convert address to string
                         '"}'
                     )
                 )

@@ -20,7 +20,6 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                 const signer = await web3Provider.getSigner();
                 const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
                 const balance = await contract.getTokensByCarId(carUniqueId);
-                console.log(balance)
 
                 const fetchedNFTPromises = balance.map(async (tokenId: any) => {
                     const tokenURI = await contract.tokenURI(tokenId.toNumber());
@@ -34,6 +33,7 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                         id: tokenId.toNumber(),
                         name: metaDataObj.name,
                         car_unique_id: metaDataObj.car_unique_id,
+                        owner: metaDataObj.owner,
                         imageUrl: metaDataObj.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                     };
                 });
