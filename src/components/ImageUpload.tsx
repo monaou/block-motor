@@ -25,10 +25,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
 
     const handleUpload = async () => {
         try {
-            const response = await fetch('YOUR_API_ENDPOINT', {
+            const response = await fetch('http://localhost:3001/api/analyze-image', {
                 method: 'POST',
-                body: preview,
-                // ... 他の必要なヘッダーや設定
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: preview }),
             });
 
             const data = await response.json();
