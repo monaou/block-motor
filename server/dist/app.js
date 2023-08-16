@@ -14,16 +14,17 @@ class CloudVisionClient {
                 languageHints: ['ja'],
             },
         };
-        console.log(request)
-        const [result] = await this.client.textDetection(request);
-        const detections = result.textAnnotations;
-        const description = detections?.[0].description;
-        return description ?? undefined;
+        // console.log(request)
+        const [result] = await this.client.objectLocalization(request);
+        // const detections = result.textAnnotations;
+        // const description = detections?.[0].description;
+        // console.log(description)
+        return result;
     }
 }
 //即時関数で実行
 (async () => {
     const client = new CloudVisionClient();
-    const result = await client.fetchImageToText('/home/monaou/block-motor/server/golf.png');
+    const result = await client.fetchImageToText('/home/monaou/block-motor/server/car_ex.jpg');
     console.log(result);
 })();
