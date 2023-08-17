@@ -33,6 +33,8 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                         id: tokenId.toNumber(),
                         name: metaDataObj.name,
                         car_unique_id: metaDataObj.car_unique_id,
+                        damage_level: metaDataObj.damage_level,
+                        created_time: metaDataObj.created_time,
                         owner: metaDataObj.owner,
                         imageUrl: metaDataObj.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                     };

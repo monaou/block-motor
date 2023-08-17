@@ -50,6 +50,7 @@ const SafeApp = (): React.ReactElement => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [imageName, setImageName] = useState('');
   const [imageId, setImageId] = useState('');
+  const [damageLevel, setDamageLevel] = useState('');
   const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
 
   const [nfts, loadingNFTs] = useSafeNFTs(web3Provider, safe.safeAddress);
@@ -79,7 +80,7 @@ const SafeApp = (): React.ReactElement => {
         for (const file of files) {
           console.log("file.cid:", file.cid)
           try {
-            const tx = await contract.mintIpfsNFT(imageName, file.cid, imageId);
+            const tx = await contract.mintIpfsNFT(imageName, file.cid, imageId, damageLevel);
             await tx.wait();
             console.log('Data has been saved successfully', { imageName, imageId });
           } catch (err) {
@@ -118,6 +119,11 @@ const SafeApp = (): React.ReactElement => {
           label="Image Name"
           value={imageName}
           onChange={(e) => setImageName(e.target.value)}
+        />
+        <TextField
+          label="Damage Level"
+          value={damageLevel}
+          onChange={(e) => setDamageLevel(e.target.value)}
         />
         <TextField
           label="Image Id"
