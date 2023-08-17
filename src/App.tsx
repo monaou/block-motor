@@ -24,6 +24,27 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const Header = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+`;
+
+const BigTitle = styled.h1`
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+`;
+
+const NFTActions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1rem;
+`;
+
+
 const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -82,7 +103,15 @@ const SafeApp = (): React.ReactElement => {
 
   return (
     <Container>
-      <Title size="sm">Wallet: {safe.safeAddress}</Title>
+      <Header>
+        <BigTitle>block-motor</BigTitle>
+      </Header>
+      <NFTActions>
+        <h3>Owned NFTs : {safe.safeAddress}</h3>
+        <Button size="md" color="primary" onClick={handleRegister}>
+          Register
+        </Button>
+      </NFTActions>
       <Modal isOpen={isModalOpen} onRequestClose={() => setModalOpen(false)}>
         <Title size="xs">Register NFT</Title>
         <TextField
@@ -109,10 +138,6 @@ const SafeApp = (): React.ReactElement => {
         <p>Loading NFTs...</p>
       ) : (
         <>
-          <h3>Owned NFTs:</h3>
-          <Button size="md" color="primary" onClick={handleRegister}>
-            Register
-          </Button>
           <NFTTable nfts={nfts} />
         </>
       )}

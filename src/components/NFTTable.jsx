@@ -1,5 +1,6 @@
 import { Button } from '@gnosis.pm/safe-react-components';
 import { Link } from 'react-router-dom';
+import './NFTTable.css';
 
 const NFTTable = ({ nfts }) => {
 
