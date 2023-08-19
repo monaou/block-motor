@@ -62,10 +62,17 @@ const FieldContainer = styled.div`
   align-items: center;
   justify-content: center;
 `;
+const ResultSummary = styled.div`
+  margin-bottom: 10px;
+  font-weight: bold;
+`;
+
+const const_score_vaild = 0.8;
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadError, onFileSelected }) => {
     const [preview, setPreview] = useState<string | null>(null);
     const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+    const [isCarValid, setIsCarValid] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files![0];
@@ -90,9 +97,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
                 body: JSON.stringify({ image: preview }),
             });
 
-            const data = await response.json();
-            setAnalysisResult(data.result);
-            onUploadSuccess(data);
+            const datas = await response.json();
+            let valid = false;
+            for (const data of datas) {
+                if (data.name === 'Car' && data.score > const_score_vaild) {
+                    valid = true;
+                    break;
+                }
+            }
+            setIsCarValid(valid);
+            setAnalysisResult(JSON.stringify(datas, null, 2)); // APIのデータを整形して表示
+            onUploadSuccess(datas);
         } catch (error) {
             onUploadError(error);
         }
@@ -105,6 +120,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
                 <HiddenInput type="file" onChange={handleFileChange} />
             </FileButton>
             <Button size="md" color="primary" onClick={handleUpload}>AI Check</Button>
+            {analysisResult && <ResultSummary>AI Check Completed! Result: {isCarValid ? "Car is valid" : "Car is not valid"}</ResultSummary>}
             <SplitFieldsContainer>
                 <FieldContainer>
                     {preview ? <ImagePreview src={preview} alt="Selected Image" /> : null}

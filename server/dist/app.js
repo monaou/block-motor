@@ -42,7 +42,7 @@ app.post('/api/analyze-image', async (req, res) => {
         const imageBuffer = req.body.image; // 画像データをバッファとして取得
         const client = new CloudVisionClient();
         const result = await client.fetchImageToText(imageBuffer);
-        res.json(result);
+        res.json(result.localizedObjectAnnotations);
     } catch (error) {
         res.status(500).json({ error: 'An error occurred processing the image.' });
     }

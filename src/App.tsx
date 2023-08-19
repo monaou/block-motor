@@ -45,12 +45,22 @@ const NFTActions = styled.div`
 `;
 
 
+const WarningMessage = styled.p`
+  color: red;
+  margin-left: 10px;
+  margin-top: 10px;
+  font-size: 12px;
+`;
+
+
 const SafeApp = (): React.ReactElement => {
   const { sdk, safe } = useSafeAppsSDK();
   const [isModalOpen, setModalOpen] = useState(false);
   const [imageName, setImageName] = useState('');
   const [imageId, setImageId] = useState('');
   const [damageLevel, setDamageLevel] = useState('');
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
+
   const web3Provider = useMemo(() => new ethers.providers.Web3Provider(new SafeAppProvider(safe, sdk)), [sdk, safe]);
 
   const [nfts, loadingNFTs] = useSafeNFTs(web3Provider, safe.safeAddress);
@@ -61,6 +71,10 @@ const SafeApp = (): React.ReactElement => {
   };
 
   const handleSave = async () => {
+    if (!imageName || !imageId || !damageLevel) {
+      setWarningMessage("All fields must be filled in.");
+      return;
+    }
     // NFTミントのロジックをここに追加
     if (!process.env.REACT_APP_WEB3_API_KEY) {
       throw new Error("API key is not set in the environment variables");
@@ -121,12 +135,12 @@ const SafeApp = (): React.ReactElement => {
           onChange={(e) => setImageName(e.target.value)}
         />
         <TextField
-          label="Damage Level"
+          label="Damage Level (0 ~ 1)"
           value={damageLevel}
           onChange={(e) => setDamageLevel(e.target.value)}
         />
         <TextField
-          label="Image Id"
+          label="Image Id (can't edit)"
           value={imageId}
           onChange={(e) => setImageId(e.target.value)}
         />
@@ -135,6 +149,8 @@ const SafeApp = (): React.ReactElement => {
           onUploadError={handleImageUploadError}
           onFileSelected={(file) => setSelectedFile(file)}
         />
+
+        {warningMessage && <WarningMessage>{warningMessage}</WarningMessage>}
         <Button size="md" color="primary" onClick={handleSave}>
           Save
         </Button>
