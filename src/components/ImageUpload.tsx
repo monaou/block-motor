@@ -3,9 +3,9 @@ import { Button } from '@gnosis.pm/safe-react-components';
 import styled from 'styled-components';
 
 interface ImageUploadProps {
-    onUploadSuccess: (response: any) => void;
-    onUploadError: (error: any) => void;
-    onFileSelected: (file: File) => void;
+  onUploadSuccess: (response: any) => void;
+  onUploadError: (error: any) => void;
+  onFileSelected: (file: File) => void;
 }
 
 const FileButton = styled.label`
@@ -67,68 +67,60 @@ const ResultSummary = styled.div`
   font-weight: bold;
 `;
 
-const const_score_vaild = 0.8;
-
 const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadError, onFileSelected }) => {
-    const [preview, setPreview] = useState<string | null>(null);
-    const [analysisResult, setAnalysisResult] = useState<string | null>(null);
-    const [isCarValid, setIsCarValid] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  const [isCarValid, setIsCarValid] = useState(false);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files![0];
-        if (file) {
-            onFileSelected(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result as string;
-                setPreview(result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files![0];
+    if (file) {
+      onFileSelected(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setPreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    const handleUpload = async () => {
-        try {
-            const response = await fetch('http://localhost:3001/api/analyze-image', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ image: preview }),
-            });
+  const handleUpload = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/analyze-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image: preview }),
+      });
 
-            const datas = await response.json();
-            let valid = false;
-            for (const data of datas) {
-                if (data.name === 'Car' && data.score > const_score_vaild) {
-                    valid = true;
-                    break;
-                }
-            }
-            setIsCarValid(valid);
-            setAnalysisResult(JSON.stringify(datas, null, 2)); // APIのデータを整形して表示
-            onUploadSuccess(datas);
-        } catch (error) {
-            onUploadError(error);
-        }
-    };
+      const datas = await response.json();
 
-    return (
-        <div>
-            <FileButton>
-                Select File
-                <HiddenInput type="file" onChange={handleFileChange} />
-            </FileButton>
-            <Button size="md" color="primary" onClick={handleUpload}>AI Check</Button>
-            {analysisResult && <ResultSummary>AI Check Completed! Result: {isCarValid ? "Car is valid" : "Car is not valid"}</ResultSummary>}
-            <SplitFieldsContainer>
-                <FieldContainer>
-                    {preview ? <ImagePreview src={preview} alt="Selected Image" /> : null}
-                </FieldContainer>
-                <Field readOnly value={analysisResult || ''} />
-            </SplitFieldsContainer>
-        </div>
-    );
+      setIsCarValid(datas.isCarWithValidScore);
+      setAnalysisResult(JSON.stringify(datas.objects, null, 2)); // APIのデータを整形して表示
+      onUploadSuccess(datas);
+    } catch (error) {
+      onUploadError(error);
+    }
+  };
+
+  return (
+    <div>
+      <FileButton>
+        Select File
+        <HiddenInput type="file" onChange={handleFileChange} />
+      </FileButton>
+      <Button size="md" color="primary" onClick={handleUpload}>AI Check</Button>
+      {analysisResult && <ResultSummary>AI Check Completed! Result: {isCarValid ? "Car is valid" : "Car is not valid"}</ResultSummary>}
+      <SplitFieldsContainer>
+        <FieldContainer>
+          {preview ? <ImagePreview src={preview} alt="Selected Image" /> : null}
+        </FieldContainer>
+        <Field readOnly value={analysisResult || ''} />
+      </SplitFieldsContainer>
+    </div>
+  );
 };
 
 export default ImageUpload;

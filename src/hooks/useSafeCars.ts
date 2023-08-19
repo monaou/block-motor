@@ -28,13 +28,15 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                     const base64String = tokenURI.replace('data:application/json;base64,', '');
                     const jsonString = atob(base64String);
                     const metaDataObj = JSON.parse(jsonString);
+                    const date = new Date(metaDataObj.created_time * 1000);
+                    const formattedDateTime = date.toLocaleString('ja-JP');
 
                     return {
                         id: tokenId.toNumber(),
                         name: metaDataObj.name,
                         car_unique_id: metaDataObj.car_unique_id,
-                        damage_level: metaDataObj.damage_level,
-                        created_time: metaDataObj.created_time,
+                        damage_level: metaDataObj.damageLevel,
+                        created_time: formattedDateTime,
                         owner: metaDataObj.owner,
                         imageUrl: metaDataObj.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                     };

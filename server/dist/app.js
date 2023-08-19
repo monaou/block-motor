@@ -17,9 +17,9 @@ class CloudVisionClient {
     constructor() {
         this.client = new ImageAnnotatorClient();
     }
+
     async fetchImageToText(base64Image) {
         const imageBuffer = Buffer.from(base64Image.split(',')[1], 'base64');
-
         const request = {
             image: {
                 content: imageBuffer,
@@ -28,12 +28,28 @@ class CloudVisionClient {
                 languageHints: ['ja'],
             },
         };
-        // console.log(request)
-        const [result] = await this.client.objectLocalization(request);
-        // const detections = result.textAnnotations;
-        // const description = detections?.[0].description;
-        // console.log(description)
-        return result;
+
+        const [textResult] = await this.client.textDetection(request);
+        const [objectResult] = await this.client.objectLocalization(request);
+
+        const textDetections = textResult.textAnnotations;
+        const description = textDetections?.[0]?.description;
+
+        let isValid = false;
+        const const_score_valid = 0.9; // ここで閾値を設定します。適切な値に変更してください。
+
+        for (const data of objectResult.localizedObjectAnnotations) {
+            if (data.name === 'Car' && data.score > const_score_valid) {
+                isValid = true;
+                break;
+            }
+        }
+
+        return {
+            text: description,
+            objects: objectResult.localizedObjectAnnotations,
+            isCarWithValidScore: isValid
+        };
     }
 }
 
