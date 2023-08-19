@@ -4,8 +4,12 @@ import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 
+// set credentials path needed
+// export GOOGLE_APPLICATION_CREDENTIALS=/home/monaou/block-motor/macro-spider-394301-f2d664c749ae.json
+// 
+
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 
 class CloudVisionClient {
