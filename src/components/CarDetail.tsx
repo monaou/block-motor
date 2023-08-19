@@ -42,6 +42,13 @@ const NFTActions = styled.div`
   width: 100%;
   margin-bottom: 1rem;
 `;
+const StatusMessage = styled.p`
+  color: red;
+  margin-top: 1rem;
+`;
+
+const DAMAGE_THRESHOLD = 0.8; // 仮定: 閾値は5。この値は変更してください。
+
 
 const CarDetailPage: React.FC = () => {
     const { sdk, safe } = useSafeAppsSDK();
@@ -50,7 +57,18 @@ const CarDetailPage: React.FC = () => {
 
     const [nfts, loadingNFTs] = useSafeCars(web3Provider, safe.safeAddress, carUniqueId || '');
     const navigate = useNavigate();  // useNavigateを使って、navigate関数を取得
+    const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
 
+    const handleCheckStatus = () => {
+        setStatusMessage("Checked");
+
+        const hasHighDamage = nfts.some(nft => parseInt(nft.damageLevel, 10) > DAMAGE_THRESHOLD);
+        if (hasHighDamage) {
+            setStatusMessage("Error: High damage detected.");
+        } else {
+            setStatusMessage("No issues detected.");
+        }
+    };
     return (
         <Container>
             <Header>
@@ -64,10 +82,12 @@ const CarDetailPage: React.FC = () => {
 
             <NFTActions>
                 <h3>Car Details : {carUniqueId}</h3>
-                <Button size="md" color="primary">
+                <Button size="md" color="primary" onClick={handleCheckStatus}>
                     Check Status
                 </Button>
             </NFTActions>
+            {statusMessage && <StatusMessage>{statusMessage}</StatusMessage>}
+
             {loadingNFTs ? (
                 <p>Loading NFTs...</p>
             ) : (
