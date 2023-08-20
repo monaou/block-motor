@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@gnosis.pm/safe-react-components';
 import styled from 'styled-components';
+import { SHA256 } from 'crypto-js';
 
 interface ImageUploadProps {
   onUploadSuccess: (response: any) => void;
@@ -71,6 +72,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
   const [preview, setPreview] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [isCarValid, setIsCarValid] = useState(false);
+  const [isTextWithValid, setIsTextWithValid] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files![0];
@@ -98,8 +100,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
       const datas = await response.json();
 
       setIsCarValid(datas.isCarWithValidScore);
-      setAnalysisResult(JSON.stringify(datas.objects, null, 2)); // APIのデータを整形して表示
-      onUploadSuccess(datas);
+      setIsTextWithValid(datas.isTextWithValid);
+
+      if (datas.isTextWithValid) {
+        // textをhashに変換
+        onUploadSuccess(SHA256(datas.text).toString());
+      }
+
+      const combinedResult = `Text: ${datas.text}\n\nObjects:\n${JSON.stringify(datas.objects, null, 2)}`;
+      setAnalysisResult(combinedResult);
     } catch (error) {
       onUploadError(error);
     }
@@ -112,7 +121,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
         <HiddenInput type="file" onChange={handleFileChange} />
       </FileButton>
       <Button size="md" color="primary" onClick={handleUpload}>AI Check</Button>
-      {analysisResult && <ResultSummary>AI Check Completed! Result: {isCarValid ? "Car is valid" : "Car is not valid"}</ResultSummary>}
+      {analysisResult && (
+        <div>
+          <ResultSummary>AI Check Completed! Result: {isCarValid ? "Car is valid" : "Car is not valid"}</ResultSummary>
+          <ResultSummary>Text Validation: {isTextWithValid ? "Text is valid" : "Text is not valid"}</ResultSummary>
+        </div>
+      )}
       <SplitFieldsContainer>
         <FieldContainer>
           {preview ? <ImagePreview src={preview} alt="Selected Image" /> : null}

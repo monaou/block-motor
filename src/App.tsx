@@ -108,7 +108,7 @@ const SafeApp = (): React.ReactElement => {
   };
   // ... SafeAppコンポーネントの中
   const handleImageUploadSuccess = (response: any) => {
-    console.log(response)
+    setImageId(response)
     // 応答に応じて、NFTのミントを呼び出すロジック
   };
 

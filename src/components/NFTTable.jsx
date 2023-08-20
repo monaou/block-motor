@@ -20,7 +20,7 @@ const NFTTable = ({ nfts }) => {
                     <tr key={nft.id}>
                         <td>{nft.id}</td>
                         <td>{nft.name}</td>
-                        <td>{nft.car_unique_id}</td>
+                        <td>{`${nft.car_unique_id.slice(0, 6)}...${nft.car_unique_id.slice(-6)}`}</td>
                         <td><img src={nft.imageUrl} alt={nft.name} width="100" /></td>
                         <td>
                             <Link to={`/car/${nft.car_unique_id}`}>

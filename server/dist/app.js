@@ -24,30 +24,50 @@ class CloudVisionClient {
             image: {
                 content: imageBuffer,
             },
+            features: [
+                { type: 'TEXT_DETECTION' },
+                { type: 'OBJECT_LOCALIZATION' }
+            ],
             imageContext: {
                 languageHints: ['ja'],
             },
         };
 
-        const [textResult] = await this.client.textDetection(request);
-        const [objectResult] = await this.client.objectLocalization(request);
+        const [result] = await this.client.annotateImage(request);
+        console.log(result)
+        const fullText = result.fullTextAnnotation?.text;
 
-        const textDetections = textResult.textAnnotations;
-        const description = textDetections?.[0]?.description;
+        // 日本のナンバープレートの正規表現を緩くする
+        const plateRegex = /[一-龯ぁ-ん]{1,4}\s\d{2,4}.{2,3}\n?[ぁ-ん]\d{2,4}-\d{2,4}/g;
+
+        let isTextWithValid = false;
+        let matchedPlates = [];
+        if (fullText) {
+            console.log(fullText);
+            let match;
+            while ((match = plateRegex.exec(fullText)) !== null) {
+                matchedPlates.push(match[0]);
+            }
+            if (matchedPlates.length) {
+                isTextWithValid = true;
+            }
+        }
+
+        let lastMatchedPlate = matchedPlates[matchedPlates.length - 1];  // 一致したパターンの中で最後のもの
 
         let isValid = false;
-        const const_score_valid = 0.9; // ここで閾値を設定します。適切な値に変更してください。
-
-        for (const data of objectResult.localizedObjectAnnotations) {
-            if (data.name === 'Car' && data.score > const_score_valid) {
+        const const_score_valid = 0.5;
+        for (const data of result.localizedObjectAnnotations) {
+            if ((data.name === 'Car' || data.name === 'Van') && data.score > const_score_valid) {
                 isValid = true;
                 break;
             }
         }
 
         return {
-            text: description,
-            objects: objectResult.localizedObjectAnnotations,
+            text: isTextWithValid ? lastMatchedPlate : null,
+            isTextWithValid: isTextWithValid,
+            objects: result.localizedObjectAnnotations,
             isCarWithValidScore: isValid
         };
     }
@@ -55,14 +75,16 @@ class CloudVisionClient {
 
 app.post('/api/analyze-image', async (req, res) => {
     try {
-        const imageBuffer = req.body.image; // 画像データをバッファとして取得
+        const imageBuffer = req.body.image;
         const client = new CloudVisionClient();
         const result = await client.fetchImageToText(imageBuffer);
-        res.json(result.localizedObjectAnnotations);
+        res.json(result);
     } catch (error) {
+        console.error("Error:", error);
         res.status(500).json({ error: 'An error occurred processing the image.' });
     }
 });
+
 
 const PORT = 3001;
 app.listen(PORT, () => {
