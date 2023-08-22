@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { SHA256 } from 'crypto-js';
 
 interface ImageUploadProps {
-  onUploadSuccess: (response: any) => void;
-  onUploadError: (error: any) => void;
+  onUploadSuccess: (response: string) => void;
   onFileSelected: (file: File) => void;
 }
 
@@ -68,25 +67,27 @@ const ResultSummary = styled.div`
   font-weight: bold;
 `;
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadError, onFileSelected }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onFileSelected }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [isCarValid, setIsCarValid] = useState(false);
   const [isTextWithValid, setIsTextWithValid] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files![0];
-    if (file) {
-      onFileSelected(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreview(result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      // rest of your code...
+      if (file) {
+        onFileSelected(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          setPreview(result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
   const handleUpload = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/analyze-image', {
@@ -110,7 +111,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUploadSuccess, onUploadErro
       const combinedResult = `Text: ${datas.text}\n\nObjects:\n${JSON.stringify(datas.objects, null, 2)}`;
       setAnalysisResult(combinedResult);
     } catch (error) {
-      onUploadError(error);
+      console.log(error);
     }
   };
 

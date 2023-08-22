@@ -3,9 +3,14 @@ import { ethers } from 'ethers';
 
 import web3Mint from './../shared_json/Web3Mint.json';
 import contractAddress from './../shared_json/contractAddress.json';
-
-const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: string): [any[], boolean] => {
-    const [nfts, setNFTs] = useState<any[]>([]);
+type NFT = {
+    id: number;
+    name: string;
+    car_unique_id: string;
+    imageUrl: string;
+};
+const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: string): [NFT[], boolean] => {
+    const [nfts, setNFTs] = useState<NFT[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,7 +22,7 @@ const useSafeNFTs = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                 const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
                 const balance = await contract.balanceOf(safeAddress);
 
-                const fetchedNFTs: any[] = [];
+                const fetchedNFTs: NFT[] = [];
 
                 for (let i = 0; i < balance.toNumber(); i++) {
                     const tokenId = await contract.tokenOfOwnerByIndex(safeAddress, i);

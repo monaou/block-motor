@@ -3,9 +3,17 @@ import { ethers } from 'ethers';
 
 import web3Mint from '../shared_json/Web3Mint.json';
 import contractAddress from '../shared_json/contractAddress.json';
-
-const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: string, carUniqueId: string): [any[], boolean] => {
-    const [nfts, setNFTs] = useState<any[]>([]);
+type NFT = {
+    id: number;
+    name: string;
+    car_unique_id: string;
+    damage_level: string;
+    created_time: string;
+    owner: string;
+    imageUrl: string;
+};
+const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: string, carUniqueId: string): [NFT[], boolean] => {
+    const [nfts, setNFTs] = useState<NFT[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -21,7 +29,7 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
                 const contract = new ethers.Contract(contractAddress.contractAddress, web3Mint.abi, signer);
                 const balance = await contract.getTokensByCarId(carUniqueId);
 
-                const fetchedNFTPromises = balance.map(async (tokenId: any) => {
+                const fetchedNFTPromises = balance.map(async (tokenId: ethers.BigNumber) => {
                     const tokenURI = await contract.tokenURI(tokenId.toNumber());
 
                     // Remove the prefix from the tokenURI
@@ -61,7 +69,7 @@ const useSafeCars = (web3Provider: ethers.providers.Web3Provider, safeAddress: s
             isMounted = false;  // クリーンアップ関数でフラグをfalseに設定
         };
 
-    }, [web3Provider, safeAddress]);
+    }, [web3Provider, safeAddress, carUniqueId]);
 
     return [nfts, loading];
 };

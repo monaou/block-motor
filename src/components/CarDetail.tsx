@@ -62,7 +62,7 @@ const CarDetailPage: React.FC = () => {
     const handleCheckStatus = () => {
         setStatusMessage("Checked");
 
-        const hasHighDamage = nfts.some(nft => parseInt(nft.damageLevel, 10) > DAMAGE_THRESHOLD);
+        const hasHighDamage = nfts.some(nft => parseInt(nft.damage_level, 10) > DAMAGE_THRESHOLD);
         if (hasHighDamage) {
             setStatusMessage("Error: High damage detected.");
         } else {

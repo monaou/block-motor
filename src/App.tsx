@@ -107,13 +107,9 @@ const SafeApp = (): React.ReactElement => {
 
   };
   // ... SafeAppコンポーネントの中
-  const handleImageUploadSuccess = (response: any) => {
+  const handleImageUploadSuccess = (response: string) => {
     setImageId(response)
     // 応答に応じて、NFTのミントを呼び出すロジック
-  };
-
-  const handleImageUploadError = (error: any) => {
-    console.error("Error uploading image:", error);
   };
 
   return (
@@ -146,7 +142,6 @@ const SafeApp = (): React.ReactElement => {
         />
         <ImageUpload
           onUploadSuccess={handleImageUploadSuccess}
-          onUploadError={handleImageUploadError}
           onFileSelected={(file) => setSelectedFile(file)}
         />
 
