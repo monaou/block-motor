@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "deploy": "HTTPS=true react-app-rewired start",
+    "deploy": "HTTPS=true react-app-rewired build",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test"
   },
